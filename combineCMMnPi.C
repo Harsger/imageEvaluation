@@ -130,11 +130,11 @@ vector<unsigned int> getSortedIndices(vector<double> order){
   
 }
 
-void referenceNparse(
+void combineCMMnPi(
     TString dataName,
     TString refName,
-    TString destination = "/project/etp4/mherrmann/imageEvaluation/differences",
-    double milliMeterPerPixel = 0.008
+    TString destination = "/project/etp4/mherrmann/imageEvaluation/cmmPoints",
+    double cmmScale = 0.001
 ){
     
     vector< vector<string> > stData = getInput( dataName.Data() );
@@ -143,13 +143,13 @@ void referenceNparse(
     vector< vector<string> > stReference = getInput( refName.Data() );
     if( stReference.size() < 1 ) return 1;
     
-    map< string , string > imageCode;
-    imageCode["image2"] = "RASFORK_BLOCK_0504";
-    imageCode["image3"] = "RASFORK_BLOCK_0506";
-    imageCode["image4"] = "RASFORK_BLOCK_0306";
-    imageCode["image5"] = "RASFORK_BLOCK_0304";
-    imageCode["image6"] = "RASFORK_BLOCK_0104";
-    imageCode["image7"] = "RASFORK_BLOCK_0106";
+    map< unsigned int , string > imageCode;
+    imageCode[2] = "RASFORK_BLOCK_0504";
+    imageCode[3] = "RASFORK_BLOCK_0506";
+    imageCode[4] = "RASFORK_BLOCK_0306";
+    imageCode[5] = "RASFORK_BLOCK_0304";
+    imageCode[6] = "RASFORK_BLOCK_0104";
+    imageCode[7] = "RASFORK_BLOCK_0106";
     
     map< string , pair< double, double > > data;
     map< string , pair< double, double > > reference;
@@ -157,22 +157,16 @@ void referenceNparse(
     for( auto line : stData ){
         
         TString imageNumber = line.at(0);
-        imageNumber.ReplaceAll( ".bmp" , "" );
-        imageNumber = imageNumber( imageNumber.Last('/')+1 , imageNumber.Sizeof() );
         
         data[ imageNumber.Data() ].first = atof( line.at(1).c_str() );
         data[ imageNumber.Data() ].second = atof( line.at(2).c_str() );
         
     }
     
-    for( auto line : stReference ){
+    for(unsigned int i=2; i<stReference.size(); i++){
         
-        TString imageNumber = line.at(0);
-        imageNumber.ReplaceAll( ".bmp" , "" );
-        imageNumber = imageNumber( imageNumber.Last('/')+1 , imageNumber.Sizeof() );
-        
-        reference[ imageNumber.Data() ].first = atof( line.at(1).c_str() );
-        reference[ imageNumber.Data() ].second = atof( line.at(2).c_str() );
+        reference[ imageCode[i] ].first = atof( stReference.at(i).at(1).c_str() ) * cmmScale;
+        reference[ imageCode[i] ].second = atof( stReference.at(i).at(2).c_str() ) * cmmScale;
         
     }
     
@@ -180,8 +174,8 @@ void referenceNparse(
     
     for( auto d : data ){
         
-        result[ imageCode[ d.first ] ].first = ( d.second.first - reference[ d.first ].first ) * milliMeterPerPixel;
-        result[ imageCode[ d.first ] ].second = ( d.second.second - reference[ d.first ].second ) * milliMeterPerPixel;
+        result[ d.first ].first = reference[ d.first ].first - d.second.first;
+        result[ d.first ].second = reference[ d.first ].second - d.second.second;
         
     }
     
@@ -189,7 +183,7 @@ void referenceNparse(
     if( !destination.EndsWith( ".txt" ) ){
         
         TString strDummy = dataName;
-        strDummy.ReplaceAll( ".txt" , "_dif.txt" );
+        strDummy.ReplaceAll( ".txt" , "_cmm.txt" );
         strDummy = strDummy( strDummy.Last('/')+1 , strDummy.Sizeof() );
         
         outname += "/";
