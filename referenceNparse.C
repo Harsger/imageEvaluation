@@ -71,12 +71,15 @@ vector< vector<string> > getInput( string filename ){
 vector<unsigned int> getSortedIndices(vector<double> order){
    
     vector<unsigned int> sorted;
+    vector<bool> used;
     unsigned int nPoints = order.size();
     double lower = 0.;
     double lowest = 0.;
     unsigned int index = 0;
     
     if( nPoints < 1 ) return sorted;
+    
+    for(unsigned int p=0; p<nPoints; p++) used.push_back( false );
 
     for(unsigned int l=0; l<nPoints; l++){
 
@@ -86,17 +89,10 @@ vector<unsigned int> getSortedIndices(vector<double> order){
             unsigned int newone = 0;
             bool found = false;
             for(unsigned int p=0; p<nPoints; p++){
-                bool inlist = false;
-                for(unsigned int s=0; s<sorted.size(); s++){
-                    if( sorted.at(s) == p ){ 
-                        inlist = true;
-                        break;
-                    }
-                }
-                if( !inlist){ 
-                    newone = p;
+                if( used.at(p) ) continue;
+                else{
                     found = true;
-                    break;
+                    newone = p;
                 }
             }
             if( !found ){
@@ -111,18 +107,23 @@ vector<unsigned int> getSortedIndices(vector<double> order){
 
         for(unsigned int p=0; p<nPoints; p++){
 
+            if( used.at(p) ) continue;
+            
             if( sorted.size() < 1 && order.at(p) < lowest ){
                 lowest = order.at(p);
                 index = p;
+                continue;
             }
-            if( order.at(p) < lowest && order.at(p) > lower  ){ 
-                index = p;
+            
+            if( order.at(p) < lowest && order.at(p) >= lower ){ 
                 lowest = order.at(p);
+                index = p;
             }
 
         }
 
         sorted.push_back( index );
+        used.at(index) = true;
 
     }
     
