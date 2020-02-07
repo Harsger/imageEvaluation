@@ -134,6 +134,7 @@ void combineCMMnPi(
     TString dataName,
     TString refName,
     TString destination = "/project/etp4/mherrmann/imageEvaluation/cmmPoints",
+    bool flip = true,
     double cmmScale = 0.001
 ){
     
@@ -172,10 +173,13 @@ void combineCMMnPi(
     
     map< string , pair< double, double > > result;
     
+    double flipper = 1.;
+    if( flip ) flipper = -1.;
+    
     for( auto d : data ){
         
-        result[ d.first ].first = reference[ d.first ].first - d.second.first;
-        result[ d.first ].second = reference[ d.first ].second - d.second.second;
+        result[ d.first ].first = reference[ d.first ].first + flipper * d.second.first;
+        result[ d.first ].second = reference[ d.first ].second + flipper * d.second.second;
         
     }
     

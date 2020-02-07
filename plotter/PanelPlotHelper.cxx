@@ -238,11 +238,11 @@ void PanelPlotHelper::plotHisto (TH2* h2) {
   } else {
     c1->SetWindowSize(w + (w - c1->GetWw()), h + (h - c1->GetWh()));
   }
-  c1->SetRightMargin(rm/w);
-  c1->SetLeftMargin(lm/w);
-  c1->SetTopMargin(tm/h);
-  c1->SetBottomMargin(bm/h);
-  c1->SetFixedAspectRatio();
+//   c1->SetRightMargin(rm/w);
+//   c1->SetLeftMargin(lm/w);
+//   c1->SetTopMargin(tm/h);
+//   c1->SetBottomMargin(bm/h);
+//   c1->SetFixedAspectRatio();
   
   gStyle->SetOptTitle(1);
 
@@ -267,7 +267,7 @@ void PanelPlotHelper::histoMaskResiduals (TH2* h2, const std::map<int, board_lay
     bool do_right_align = parser.isRI();
     if (parser.imask() == 2) do_right_align = !do_right_align;
 
-    double offset = (do_right_align ? -10. : + 10.);
+    double offset = (do_right_align ? -30. : + 30.);
     TLatex* text = new TLatex(vmask.X()+offset, vmask.Y(), (boost::format("%.0f#mum")%(deltay*1000.)).str().c_str());
     text->SetTextFont(42);
     text->SetTextSize(0.02);
@@ -293,6 +293,11 @@ void PanelPlotHelper::histoMaskResiduals (TH2* h2, const std::map<int, board_lay
         deltay_arrow = parser.arrowDirection()*0.02*deltay_arrow/abs(deltay_arrow);
     }
 
+    bool do_right_align = parser.isRI();
+    if (parser.imask() == 2) do_right_align = !do_right_align;
+
+    double offset = (do_right_align ? -30. : + 30.);
+
     int col = parser.color();
 
     const board_layout_t& l = bmap.find(parser.ipcb())->second;
@@ -304,6 +309,7 @@ void PanelPlotHelper::histoMaskResiduals (TH2* h2, const std::map<int, board_lay
 //       arr = new TArrow(vmask.X(), vmask.Y(), vmask.X()+scale*deltax_arrow, vmask.Y()+scale*deltay_arrow, 0.01, "|>");
     if( parser.singleArrow ){
         arr = new TArrow(vmask.X(), vmask.Y(), vmask.X()+scale*deltax_arrow, vmask.Y()+scale*deltay_arrow, 0.01, "|>");
+//         arr = new TArrow(vmask.X()-offset, vmask.Y(), vmask.X()-offset, vmask.Y()+scale*deltay_arrow, 0.01, "|>");
         arr->SetLineColor(col);
         arr->SetFillColor(col);
         h2->GetListOfFunctions()->Add(arr);
@@ -320,15 +326,16 @@ void PanelPlotHelper::histoMaskResiduals (TH2* h2, const std::map<int, board_lay
         h2->GetListOfFunctions()->Add(arr);
     }
 
-    bool do_right_align = parser.isRI();
-    if (parser.imask() == 2) do_right_align = !do_right_align;
-
-    double offset = (do_right_align ? -10. : + 10.);
+//     bool do_right_align = parser.isRI();
+//     if (parser.imask() == 2) do_right_align = !do_right_align;
+// 
+//     double offset = (do_right_align ? -30. : + 30.);
     TLatex* text;
     if (std::isnan(deltax))
       text = new TLatex(vmask.X()+offset, vmask.Y(), (boost::format("%.0f")%(deltay*1000.)).str().c_str());
     else
-      text = new TLatex(vmask.X()+offset, vmask.Y(), (boost::format("(%.0f,%.0f)")%(deltax*1000.)%(deltay*1000.)).str().c_str());
+      text = new TLatex(vmask.X()+offset, vmask.Y(), (boost::format("( %.0f , %.0f )")%(deltax*1000.)%(deltay*1000.)).str().c_str());
+//       text = new TLatex(vmask.X()+offset, vmask.Y(), (boost::format("(%.0f+/-%.0f)#mum")%(deltay*1000.)%(deltax*1000.)).str().c_str());
     text->SetTextFont(42);
     text->SetTextSize(0.02);
     if (do_right_align)

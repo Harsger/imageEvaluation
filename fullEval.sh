@@ -6,7 +6,7 @@ root -l -q -x ${workDir}'referenceNparse.C("'${workDir}'ROpanels/'${filename}'.t
 
 root -l -q -x ${workDir}'combineCMMnPi.C("'${workDir}'parsed/'${filename}'_dif.txt","/project/etpdaq/cmm/camLeftPinsNmarker.txt")'
 
-root -l -q -x ${workDir}'globalFit.C("'${workDir}'cmmPoints/'${filename}'_dif_cmm.txt")'
+root -l -q -x ${workDir}'globalFit.C("'${workDir}'cmmPoints/'${filename}'_dif_cmm.txt",true)'
 
 cd plotter
 

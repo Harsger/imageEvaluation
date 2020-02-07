@@ -197,6 +197,13 @@ void alignmentPlotter(
     
     TString panelID = filename;
     panelID = panelID( panelID.Last('/')+1 , panelID.Sizeof() );
+    panelID.ReplaceAll( "camOldPinsNmarker_" , "" );
+    panelID.ReplaceAll( "camLeftPinsNmarker_" , "" );
+    panelID.ReplaceAll( "camRightPinsNmarker_" , "" );
+    panelID.ReplaceAll( "_fits" , "" );
+    panelID.ReplaceAll( "_dif" , "" );
+    panelID.ReplaceAll( "_cmm" , "" );
+    panelID.ReplaceAll( "_residuals" , "" );
     panelID.ReplaceAll( ".txt" , "" );
     
     vector< vector<string> > data = getInput( filename.Data() );
@@ -206,6 +213,9 @@ void alignmentPlotter(
     for( auto d : data ){
         xyvalues[ d.at(0) ].first = atof( d.at(1).c_str() );
         xyvalues[ d.at(0) ].second = atof( d.at(2).c_str() );
+        cout << d.at(0) << " \t " << xyvalues[ d.at(0) ].first << " \t " << xyvalues[ d.at(0) ].second << endl;
+        if( xyvalues[ d.at(0) ].first == 0. ) xyvalues[ d.at(0) ].first = 1e-6;
+        if( xyvalues[ d.at(0) ].second == 0. ) xyvalues[ d.at(0) ].second = 1e-6;
     }
     
     RasforkParser parser;

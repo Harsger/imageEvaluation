@@ -80,9 +80,11 @@ void SM2function( Int_t & , Double_t * , Double_t& f , Double_t* par , Int_t ) {
         residuals[i][0] = dX;
         residuals[i][1] = dY;
         
-        Double_t dr = TMath::Sqrt( dX * dX + dY * dY );
+//         Double_t dr = TMath::Sqrt( dX * dX + dY * dY );
+//         f += dr * dr;
         
-        f += dr * dr;
+        if( freeFit ) f += dY * dY ;
+        else f += ( dX * dX + dY * dY );
         
     }
    
@@ -101,11 +103,14 @@ void doSM2fit(){
     fitter->SetParameter(1, "Y" , estimate[1] , 0.01 , estimate[1] - 100 , estimate[1] + 100 );
     fitter->SetParameter(2, "P" , 0. , 0.001 , -0.2 , 0.2 );
         
-    if( !freeFit ){ 
-//         fitter->SetParameter(0, "X" ,   estimate[0] , 0. ,   estimate[0] ,   estimate[0] );
+    if( freeFit ){
+        fitter->SetParameter(0, "X" ,   estimate[0] , 0. ,   estimate[0] ,   estimate[0] );
+        fitter->FixParameter(0);
+    }  
+    else{ 
+//     if( !freeFit ){
         fitter->SetParameter(1, "Y" ,   estimate[1] , 0. ,   estimate[1] ,   estimate[1] );
         fitter->SetParameter(2, "P" , slopeEstimate , 0. , slopeEstimate , slopeEstimate );
-//         fitter->FixParameter(0);
         fitter->FixParameter(1);
         fitter->FixParameter(2);
     }
@@ -295,5 +300,13 @@ void globalFit(
     output.close();
     
     cout << " data written to : " << outname.Data() << endl;
+    
+    ofstream textfile;
+    textfile.open( "fitParameter.txt" , std::ios_base::app );
+
+    textfile << "// " << dataName << endl;
+    textfile << "{";
+    for(unsigned int c=0; c<3; c++) textfile << fitResults.at(c) << "," << fitResults.at(c+3) << ",";
+    textfile << fitResults.at( fitResults.size()-1 ) << "}," << endl;
     
 }

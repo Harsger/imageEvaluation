@@ -135,6 +135,7 @@ void referenceNparse(
     TString dataName,
     TString refName,
     TString destination = "/project/etp4/mherrmann/imageEvaluation/differences",
+    unsigned int offset = 2,
     double milliMeterPerPixel = 0.008
 ){
     
@@ -144,36 +145,47 @@ void referenceNparse(
     vector< vector<string> > stReference = getInput( refName.Data() );
     if( stReference.size() < 1 ) return 1;
     
-    map< string , string > imageCode;
-    imageCode["image2"] = "RASFORK_BLOCK_0504";
-    imageCode["image3"] = "RASFORK_BLOCK_0506";
-    imageCode["image4"] = "RASFORK_BLOCK_0306";
-    imageCode["image5"] = "RASFORK_BLOCK_0304";
-    imageCode["image6"] = "RASFORK_BLOCK_0104";
-    imageCode["image7"] = "RASFORK_BLOCK_0106";
+    map< unsigned int , string > imageCode;
+    imageCode[offset+0] = "RASFORK_BLOCK_0504";
+    imageCode[offset+1] = "RASFORK_BLOCK_0506";
+    imageCode[offset+2] = "RASFORK_BLOCK_0306";
+    imageCode[offset+3] = "RASFORK_BLOCK_0304";
+    imageCode[offset+4] = "RASFORK_BLOCK_0104";
+    imageCode[offset+5] = "RASFORK_BLOCK_0106";
     
-    map< string , pair< double, double > > data;
-    map< string , pair< double, double > > reference;
+    map< unsigned int , pair< double, double > > data;
+    map< unsigned int , pair< double, double > > reference;
+    
+    TString imageNumber;
+    unsigned int number;
     
     for( auto line : stData ){
         
-        TString imageNumber = line.at(0);
+        imageNumber = line.at(0);
         imageNumber.ReplaceAll( ".bmp" , "" );
+        imageNumber.ReplaceAll( "image" , "" );
+        imageNumber.ReplaceAll( "moveCMMCam_" , "" );
         imageNumber = imageNumber( imageNumber.Last('/')+1 , imageNumber.Sizeof() );
         
-        data[ imageNumber.Data() ].first = atof( line.at(1).c_str() );
-        data[ imageNumber.Data() ].second = atof( line.at(2).c_str() );
+        number = atoi( imageNumber.Data() );
+        
+        data[ number ].first = atof( line.at(1).c_str() );
+        data[ number ].second = atof( line.at(2).c_str() );
         
     }
     
     for( auto line : stReference ){
         
-        TString imageNumber = line.at(0);
+        imageNumber = line.at(0);
         imageNumber.ReplaceAll( ".bmp" , "" );
+        imageNumber.ReplaceAll( "image" , "" );
+        imageNumber.ReplaceAll( "moveCMMCam_" , "" );
         imageNumber = imageNumber( imageNumber.Last('/')+1 , imageNumber.Sizeof() );
         
-        reference[ imageNumber.Data() ].first = atof( line.at(1).c_str() );
-        reference[ imageNumber.Data() ].second = atof( line.at(2).c_str() );
+        number = atoi( imageNumber.Data() );
+        
+        reference[ number ].first = atof( line.at(1).c_str() );
+        reference[ number ].second = atof( line.at(2).c_str() );
         
     }
     
